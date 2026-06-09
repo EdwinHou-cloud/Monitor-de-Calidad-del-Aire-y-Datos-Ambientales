@@ -1,0 +1,31 @@
+# Configuración con claves de API
+config.py
+
+# Datos generados
+data/raw/
+data/processed/
+
+# Modelos y bases de datos
+*.pkl
+*.db
+
+# Python
+__pycache__/
+*.pyc
+
+# Entornos y entorno local
+.env
+
+# Sistema
+.DS_Store
+
+.env
+config.py
+data/raw/
+data/processed/
+*.pkl
+*.db
+__pycache__/
+
+README.md
+app_old.py
