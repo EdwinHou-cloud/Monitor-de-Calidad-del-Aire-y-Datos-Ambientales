@@ -188,32 +188,37 @@ col_mapa, col_resumen = st.columns([3, 2])
 
 with col_mapa:
     st.subheader("Mapa de calidad del aire en America Latina")
-    mapa = folium.Map(location=[-20,-75], zoom_start=2, tiles="CartoDB positron")
+    mapa = folium.Map(location=[-20,-75], zoom_start=2, tiles="CartoDB positron", max_bounds=True, min_zoom=2)
 
     for _, fila in ultimas.iterrows():
         info = CIUDADES.get(fila["ciudad"])
         if info is None:
             continue
-        
+
         aqi_val = fila["aqi"] if pd.notna(fila["aqi"]) else None
-        
+        pm25_txt = f"{fila['pm25']:.1f}" if pd.notna(fila["pm25"]) else "N/D"
+
         if aqi_val is not None:
             categoria = get_categoria_aqi(int(round(aqi_val)))
-            color = COLOR_CATEGORIA.get(categoria["etiqueta"], "gray")
-            radio = max(8, min(40, float(aqi_val) / 5))
-            txt_aqi = f"{aqi_val:.0f}"
-            txt_cat = categoria["etiqueta"]
+            color    = COLOR_CATEGORIA.get(categoria["etiqueta"], "gray")
+            radio    = max(8, min(40, float(aqi_val) / 5))
+            txt_aqi  = f"{aqi_val:.0f}"
+            txt_cat  = categoria["etiqueta"]
         else:
-            color = "gray"
-            radio = 8
+            color   = "gray"
+            radio   = 8
             txt_aqi = "N/D"
             txt_cat = "Sin datos"
 
         popup_html = (
-            f"<b>{fila['ciudad']}</b><br>"
-            f"AQI: {txt_aqi}<br>"
-            f"PM2.5: {f'{fila['pm25']:.1f}' if pd.notna(fila['pm25']) else 'N/D'}<br>"
-            f"Categoría: {txt_cat}"
+            f"<div style='font-size:12px; padding:6px; min-width:140px; "
+            f"max-width:180px; line-height:1.8; font-family:sans-serif'>"
+            f"<b style='font-size:14px'>{fila['ciudad']}</b>"
+            f"<hr style='margin:4px 0'>"
+            f"🌫️ AQI: <b>{txt_aqi}</b><br>"
+            f"💨 PM2.5: <b>{pm25_txt}</b><br>"
+            f"📊 Categoría: <b>{txt_cat}</b>"
+            f"</div>"
         )
 
         folium.CircleMarker(
@@ -223,11 +228,11 @@ with col_mapa:
             fill=True,
             fill_color=color,
             fill_opacity=0.6,
-            popup=folium.Popup(popup_html, max_width=250),
-            tooltip=fila["ciudad"],
+            popup=folium.Popup(popup_html, max_width=200, min_width=140),
+            tooltip=f"{fila['ciudad']} — AQI {txt_aqi}",
         ).add_to(mapa)
 
-    st_folium(mapa, width=None, height=420)
+    st_folium(mapa, width=None, height=420, returned_objects=[])
 
 with col_resumen:
     st.subheader("Resumen del día")
