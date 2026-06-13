@@ -23,7 +23,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from streamlit_folium import st_folium
 
-from config import CIUDADES, CSV_PROCESADO, get_categoria_aqi
+from config import CIUDADES, CSV_PROCESADO, get_categoria_aqi, PAIS_POR_CIUDAD
 from llm.resumenes import generar_resumen_diario
 from models.clasificador import get_feature_importance
 from models.prediccion import entrenar_y_predecir
@@ -144,17 +144,33 @@ st.caption("Universidad Tecnologica de Panama - Gestion de la Informacion - Parc
 
 df = cargar_datos()
 
-
 # Sidebar
 
 st.sidebar.header("Filtros")
 
 ciudades_disponibles = list(CIUDADES.keys())
-ciudades_sel = st.sidebar.multiselect(
-    "Ciudades",
-    ciudades_disponibles,
-    default=ciudades_disponibles,
+
+paises_disponibles = sorted(set(PAIS_POR_CIUDAD.get(c, "Otros") for c in ciudades_disponibles))
+
+paises_sel = st.sidebar.multiselect(
+    "Países",
+    paises_disponibles,
+    default=paises_disponibles,
+    help="Escribe para buscar un país. Haz clic para agregar o quitar de la selección.",
 )
+
+ciudades_filtradas_por_pais = [
+    c for c in ciudades_disponibles
+    if PAIS_POR_CIUDAD.get(c, "Otros") in paises_sel
+]
+
+with st.sidebar.expander("Afinar ciudades", expanded=False):
+    ciudades_sel = st.multiselect(
+        "Ciudades",
+        ciudades_filtradas_por_pais,
+        default=ciudades_filtradas_por_pais,
+        help="Escribe para buscar una ciudad específica.",
+    )
 
 if not df.empty and df["timestamp"].notna().any():
     fecha_min = df["timestamp"].min().date()

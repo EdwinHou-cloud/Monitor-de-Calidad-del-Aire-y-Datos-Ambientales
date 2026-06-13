@@ -116,8 +116,8 @@ Mapa interactivo basado en el enfoque del articulo [Building a Live Weather and 
 ## Grupo 6 - UTP
 
 Proyecto academico de la materia Gestion de la Informacion.
-Edwin Hou
-Emanuel Gonzalez
-Edward Camaño
-David Pimentel
-Fernando Lezcano
+- Edwin Hou
+- Emanuel Gonzalez
+- Edward Camaño
+- David Pimentel
+- Fernando Lezcano
